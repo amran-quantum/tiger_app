@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include tiger_app *.css
+recursive-include tiger_app *.csv
+recursive-include tiger_app *.html
+recursive-include tiger_app *.ico
+recursive-include tiger_app *.js
+recursive-include tiger_app *.json
+recursive-include tiger_app *.md
+recursive-include tiger_app *.png
+recursive-include tiger_app *.py
+recursive-include tiger_app *.svg
+recursive-include tiger_app *.txt
+recursive-exclude tiger_app *.pyc
