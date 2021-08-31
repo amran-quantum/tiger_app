@@ -1,0 +1,184 @@
+{
+ "actions": [],
+ "creation": "2021-08-30 14:46:50.855859",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "ps_date",
+  "employee",
+  "code",
+  "employee_name",
+  "department",
+  "payment_days",
+  "basic",
+  "salary",
+  "eligible",
+  "earnings",
+  "deductions",
+  "payables",
+  "earning_note",
+  "deduction_note",
+  "leave_note",
+  "qid",
+  "bank_name",
+  "iban",
+  "payroll_status",
+  "net_pay",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Data",
+   "label": "Employee"
+  },
+  {
+   "fieldname": "code",
+   "fieldtype": "Data",
+   "in_global_search": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Code"
+  },
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Employee Name"
+  },
+  {
+   "fieldname": "payment_days",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Payment Days"
+  },
+  {
+   "fieldname": "salary",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Salary"
+  },
+  {
+   "fieldname": "eligible",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Eligible"
+  },
+  {
+   "fieldname": "earnings",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Earnings"
+  },
+  {
+   "fieldname": "deductions",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Deductions"
+  },
+  {
+   "fieldname": "payables",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Payables"
+  },
+  {
+   "fieldname": "earning_note",
+   "fieldtype": "Long Text",
+   "label": "Earning Note"
+  },
+  {
+   "fieldname": "deduction_note",
+   "fieldtype": "Long Text",
+   "label": "Deduction Note",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "leave_note",
+   "fieldtype": "Long Text",
+   "label": "Leave Note",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "basic",
+   "fieldtype": "Data",
+   "label": "Basic",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "qid",
+   "fieldtype": "Data",
+   "label": "QID",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "bank_name",
+   "fieldtype": "Data",
+   "label": "Bank Name",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "iban",
+   "fieldtype": "Data",
+   "label": "IBAN",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "payroll_status",
+   "fieldtype": "Data",
+   "label": "Payroll Status",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Data",
+   "label": "Department"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Shadow Slip",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "net_pay",
+   "fieldtype": "Data",
+   "label": "Net Pay"
+  },
+  {
+   "fieldname": "ps_date",
+   "fieldtype": "Data",
+   "label": "Payslip for the month of"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2021-08-30 18:33:19.679976",
+ "modified_by": "Administrator",
+ "module": "Tiger App",
+ "name": "Shadow Slip",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
