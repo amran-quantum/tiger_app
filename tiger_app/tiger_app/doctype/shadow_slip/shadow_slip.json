@@ -25,6 +25,7 @@
   "iban",
   "payroll_status",
   "net_pay",
+  "payment_mode",
   "amended_from"
  ],
  "fields": [
@@ -154,12 +155,17 @@
    "fieldname": "ps_date",
    "fieldtype": "Data",
    "label": "Payslip for the month of"
+  },
+  {
+   "fieldname": "payment_mode",
+   "fieldtype": "Data",
+   "label": "Payment Mode"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-08-30 18:33:19.679976",
+ "modified": "2021-08-31 13:33:05.408428",
  "modified_by": "Administrator",
  "module": "Tiger App",
  "name": "Shadow Slip",

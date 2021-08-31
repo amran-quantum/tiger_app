@@ -6,8 +6,6 @@
  "engine": "InnoDB",
  "field_order": [
   "employee",
-  "code",
-  "employee_name",
   "payment_days",
   "salary",
   "eligible",
@@ -19,31 +17,16 @@
   "leave_note",
   "basic",
   "qid",
-  "bank_name",
   "iban",
   "payroll_status",
-  "department",
   "amended_from"
  ],
  "fields": [
   {
    "fieldname": "employee",
-   "fieldtype": "Data",
-   "label": "Employee"
-  },
-  {
-   "fieldname": "code",
-   "fieldtype": "Data",
-   "in_global_search": 1,
-   "in_list_view": 1,
-   "in_preview": 1,
-   "in_standard_filter": 1,
-   "label": "Code"
-  },
-  {
-   "fieldname": "employee_name",
-   "fieldtype": "Data",
-   "label": "Employee Name"
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
   },
   {
    "fieldname": "payment_days",
@@ -112,13 +95,9 @@
   },
   {
    "fieldname": "payroll_status",
-   "fieldtype": "Data",
-   "label": "Payroll Status"
-  },
-  {
-   "fieldname": "department",
-   "fieldtype": "Data",
-   "label": "Department"
+   "fieldtype": "Select",
+   "label": "Payroll Status",
+   "options": "WPS Compliance\nNon Compliance"
   },
   {
    "fieldname": "amended_from",
@@ -128,17 +107,12 @@
    "options": "Pay Slip Tiger",
    "print_hide": 1,
    "read_only": 1
-  },
-  {
-   "fieldname": "bank_name",
-   "fieldtype": "Data",
-   "label": "Bank Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-08-30 18:26:36.225074",
+ "modified": "2021-08-31 14:19:56.945997",
  "modified_by": "Administrator",
  "module": "Tiger App",
  "name": "Pay Slip Tiger",
