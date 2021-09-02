@@ -45,8 +45,9 @@ frappe.ui.form.on('Pay Slip Tiger', {
 									'doctype': 'Shadow Slip',
 									'filters': {'employee_name': employee_data.employee_name,'ps_date': n,},
 									'fieldname': [
-										'employee_name',
-										'ps_date'
+										'name'
+										// 'employee_name',
+										// 'ps_date'
 									]
 								},
 								callback: function(re) {
@@ -54,7 +55,9 @@ frappe.ui.form.on('Pay Slip Tiger', {
 										// code snippet
 										// console.log("thisis r = ",r.message.name)
 										if(re.message){
-											frappe.throw("Already Added!")
+											// console.log(re.message);
+											frappe.set_route(`app/print/Shadow Slip/${re.message.name}`)
+											// frappe.throw("Already Added!")
 										}else{
 											frappe.db.insert({
 												"doctype": "Shadow Slip",
