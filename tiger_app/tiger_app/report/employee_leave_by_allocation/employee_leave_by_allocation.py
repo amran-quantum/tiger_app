@@ -49,10 +49,13 @@ def execute(filters=None):
 					leave_allocation = frappe.db.count('Leave Allocation', {'employee_name':item.employee_name,'leave_type': e })
 				if leave_allocation > 0:
 					row.append(leave_details[0].total_leaves_allocated)
+					row.append(0)
+					row.append(leave_details[0].total_leaves_allocated)
 				else:
 					row.append(0)
-				row.append(0)
-				row.append(0)
+					row.append(0)
+					row.append(0)
+				
 					
 		data.append(row)
 	return columns, data
