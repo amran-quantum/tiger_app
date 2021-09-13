@@ -18,11 +18,10 @@ def execute(filters=None):
 		for e in leave_types:
 			ldata = ""
 			if "Annual" in e:
-				leave = frappe.get_list('Leave Allocation', filters={'employee_name':item.employee_name,'leave_type':['like', '%Annual%'] }, fields={'leave_type'})
-				ldata = leave[0].leave_type
-				leave_details = frappe.db.sql("""select * from `tabLeave Type` where leave_type_name=%(ltn)s""",{"ltn":ldata},as_dict=1)
+				leave_details = frappe.get_list('Leave Allocation', filters={'employee_name':item.employee_name,'leave_type':['like', '%Annual%'] }, fields={'leave_type','total_leaves_allocated'})
+				ldata = leave_details[0].leave_type
 			else:
-				leave_details = frappe.db.sql("""select * from `tabLeave Type` where leave_type_name=%(ltn)s""",{"ltn":e},as_dict=1)
+				leave_details = frappe.db.sql("""select * from `tabLeave Allocation` where leave_type=%(ltn)s and employee_name=%(emp_name)s""",{"ltn":e,"emp_name":item.employee_name},as_dict=1)
 				ldata = e
 			leave_application = frappe.get_list('Leave Application',
 			filters={"employee_name": item.employee_name,
@@ -33,7 +32,7 @@ def execute(filters=None):
 			fields={"total_leave_days"}
 						)
 			if len(leave_application)> 0: 			
-				total = leave_details[0].max_leaves_allowed
+				total = leave_details[0].total_leaves_allocated
 				taken = 0
 
 				for elem in leave_application:
@@ -49,7 +48,7 @@ def execute(filters=None):
 				else:
 					leave_allocation = frappe.db.count('Leave Allocation', {'employee_name':item.employee_name,'leave_type': e })
 				if leave_allocation > 0:
-					row.append(leave_details[0].max_leaves_allowed)
+					row.append(leave_details[0].total_leaves_allocated)
 				else:
 					row.append(0)
 				row.append(0)
