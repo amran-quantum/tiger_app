@@ -3,6 +3,5 @@
 
 frappe.ui.form.on('Shadow Slip', {
 	// refresh: function(frm) {
-
 	// }
 });

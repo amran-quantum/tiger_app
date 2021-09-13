@@ -97,11 +97,7 @@ frappe.ui.form.on('Pay Slip Tiger', {
 						
 					}
 				}
-			});
-			
-			
-
-			
+			});		
 		});
 	}
 });
