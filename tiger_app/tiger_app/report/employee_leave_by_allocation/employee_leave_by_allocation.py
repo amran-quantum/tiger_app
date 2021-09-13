@@ -1,9 +1,6 @@
 # Copyright (c) 2013, Frappe Technologies Pvt. Ltd. and contributors
 # For license information, please see license.txt
 
-# import frappe
-from __future__ import unicode_literals
-from erpnext.payroll.report.salary_register.salary_register import get_columns
 import frappe
 from frappe import _
 
@@ -11,6 +8,16 @@ def execute(filters=None):
 	columns, data = [], []
 
 	columns, leave_types = get_columns()
+	fy = frappe.get_list('Fiscal Year',fields={'year_start_date','year_end_date'})
+	filters.update({
+		'from_date': fy[0].year_start_date,
+		'to_date': fy[0].year_end_date
+	})
+	# frappe.msgprint(str(filters))
+	# filters = {
+	# 	'from_date': str(fy[0].year_start_date),
+	# 	'to_date': str(fy[0].year_end_date)
+	# }
 	fdata = get_data(filters)
 	for item in fdata:
 		row = [item.employee_name]
