@@ -3,16 +3,27 @@
 
 import frappe
 from frappe import _
+from datetime import datetime
 
 def execute(filters=None):
 	columns, data = [], []
 
 	columns, leave_types = get_columns()
-	fy = frappe.get_list('Fiscal Year',fields={'year_start_date','year_end_date'})
-	filters.update({
-		'from_date': fy[0].year_start_date,
-		'to_date': fy[0].year_end_date
-	})
+	if filters.year:
+		filters.update({
+			'from_date': filters.year+"-01-01",
+			'to_date': filters.year+"-12-31"
+		})
+	else:
+		filters.update({
+			'from_date':datetime.now().date().replace(month=1, day=1),    
+			'to_date': datetime.now().date().replace(month=12, day=31)
+		})
+	# fy = frappe.get_list('Fiscal Year',fields={'year_start_date','year_end_date'})
+	# filters.update({
+	# 	'from_date': fy[0].year_start_date,
+	# 	'to_date': fy[0].year_end_date
+	# })
 	# frappe.msgprint(str(filters))
 	# filters = {
 	# 	'from_date': str(fy[0].year_start_date),
@@ -20,7 +31,7 @@ def execute(filters=None):
 	# }
 	fdata = get_data(filters)
 	for item in fdata:
-		row = [item.employee_name]
+		row = [item.department_code,item.employee_name]
 
 		for e in leave_types:
 			ldata = ""
@@ -70,6 +81,7 @@ def execute(filters=None):
 
 def get_columns():
 	columns = [
+		 _("Department Code") + "::140",
 		 _("Employee Name") + "::140"
 	]
 	leave_types = {_("lt_list"): []}
@@ -90,7 +102,7 @@ def get_columns():
 def get_data(filters):
 	data = frappe.db.sql(
 		"""
-		select distinct employee_name from `tabLeave Allocation` where from_date>=%(from_date)s and to_date<=%(to_date)s
+		select distinct ta.employee_name, em.department_code from `tabLeave Allocation` ta, `tabEmployee` em where from_date>=%(from_date)s and to_date<=%(to_date)s and ta.employee_name=em.employee_name
 		"""
 	,{"from_date":filters.from_date, "to_date":filters.to_date},as_dict=1)
 	
