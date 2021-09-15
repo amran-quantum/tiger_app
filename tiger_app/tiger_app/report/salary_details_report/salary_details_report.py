@@ -49,11 +49,18 @@ def execute(filters=None):
 		
 		col.sort(key=lambda x: x.get('sc'))
 	
+		min = 0
 		for idx,value in enumerate(row):
-			if value == col[idx]['sc']:
-				item.append(flt(col[idx]['amount']))
-			else:
+			if not any(d['sc'] == value for d in col):
 				item.append(0)
+				min += 1
+				# if item[0] == "Tanim Ahmed": frappe.msgprint(str(min))
+			else:
+				if value == col[idx-min]['sc']:
+					item.append(flt(col[idx-min]['amount']))
+					min = 0
+				else:
+					item.append(0)
 		item.pop(4)
 
 	
@@ -65,7 +72,7 @@ def execute(filters=None):
 	return columns, data
 def get_columns():
 	
-	columns = ["Employee Name","Salary Structure","Date of Joining","Relieving Date"]
+	columns = ["Department Code","Employee Name","Salary Structure","Date of Joining"]
 	
 	return columns
 
@@ -110,8 +117,8 @@ def get_emp_list(filters):
 		cond += "and %(from_date)s >= t2.from_date"
 		emp_list = frappe.db.sql("""
 			select
-				distinct t1.name as employee, t1.employee_name, t2.salary_structure, sd.parent, sd.sales,
-				t1.date_of_joining, t1.relieving_date,t1.status
+				distinct t1.department_code, t1.name as employee, t1.employee_name, t2.salary_structure, sd.parent, sd.sales,
+				t1.date_of_joining, t1.status
 			from
 				`tabEmployee` t1, `tabSalary Structure Assignment` t2
 			LEFT JOIN 
@@ -130,5 +137,5 @@ def get_emp_list(filters):
 		for item in emp_list:
 			if item.employee not in names:
 				names += item.employee
-				rdata.append([item.employee_name, item.salary_structure, item.date_of_joining, item.relieving_date, item.sales])
+				rdata.append([item.department_code,item.employee_name, item.salary_structure, item.date_of_joining, item.sales])
 		return rdata
