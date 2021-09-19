@@ -1,6 +1,7 @@
 # Copyright (c) 2013, Frappe Technologies Pvt. Ltd. and contributors
 # For license information, please see license.txt
 
+from re import match
 import frappe
 from datetime import date
 import calendar
@@ -35,41 +36,47 @@ def execute(filters=None):
 		sub_item = item_break[1:-1]
 		split_sub_item = sub_item.split(', {')
 		col = []
+		for el in row:
+			col.append({'amount':0,'sc':el})
+
 		for elem in split_sub_item:
 			if elem.count('{')==0:
 				csse = elem[:-1].split(',')
 				amount = csse[0].split(':')[1]
 				sc = csse[1].split(':')[1][1:-1]
-				col.append({'amount':amount,'sc':sc[:-1]})
+				index = in_dictlist('sc',sc[:-1], col)
+				col[index].update({'amount':amount})
 			else:
 				esse = elem[1:-1].split(',')
 				amount = esse[0].split(':')[1]
 				sc = esse[1].split(':')[1][1:-1]
-				col.append({'amount':amount,'sc':sc[:-1]})
-		
-		col.sort(key=lambda x: x.get('sc'))
-	
-		min = 0
+				index = in_dictlist('sc',sc[:-1], col)
+				col[index].update({'amount':amount})
+
+		total = 0		
+        	
 		for idx,value in enumerate(row):
-			if not any(d['sc'] == value for d in col):
-				item.append(0)
-				min += 1
-				# if item[0] == "Tanim Ahmed": frappe.msgprint(str(min))
-			else:
-				if value == col[idx-min]['sc']:
-					item.append(flt(col[idx-min]['amount']))
-					min = 0
-				else:
-					item.append(0)
+			item.append(flt(col[idx]['amount']))
+			total = total + flt(col[idx]['amount'])
+		item.append(total)
+
 		item.pop(4)
 
-	
+	row.append("Total")
 	columns += row
+
 	
 	data = tdata
 
 
 	return columns, data
+
+def in_dictlist(key, value, my_dictlist):
+    for index,entry in enumerate(my_dictlist):
+        if entry[key] == value:
+            return index
+    return {}
+
 def get_columns():
 	
 	columns = ["Department Code","Employee Name","Salary Structure","Date of Joining"]

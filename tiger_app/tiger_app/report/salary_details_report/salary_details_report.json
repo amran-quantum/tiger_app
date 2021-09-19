@@ -1,5 +1,5 @@
 {
- "add_total_row": 0,
+ "add_total_row": 1,
  "columns": [],
  "creation": "2021-09-06 11:31:05.820138",
  "disable_prepared_report": 0,
@@ -9,7 +9,7 @@
  "filters": [],
  "idx": 0,
  "is_standard": "Yes",
- "modified": "2021-09-14 19:02:59.928436",
+ "modified": "2021-09-19 15:31:34.941280",
  "modified_by": "Administrator",
  "module": "Tiger App",
  "name": "Salary Details Report",
