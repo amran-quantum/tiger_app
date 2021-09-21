@@ -1,0 +1,23 @@
+{
+ "creation": "2021-09-20 12:46:05.308070",
+ "docstatus": 0,
+ "doctype": "Number Card",
+ "dynamic_filters_json": "{}",
+ "filters_json": "{\"from_date\":\"2021-09-20\",\"to_date\":\"2021-09-20\"}",
+ "function": "Count",
+ "idx": 0,
+ "is_public": 1,
+ "is_standard": 1,
+ "label": "Employee Absent",
+ "modified": "2021-09-20 12:46:05.308070",
+ "modified_by": "Administrator",
+ "module": "Tiger App",
+ "name": "Employee Absent",
+ "owner": "Administrator",
+ "report_field": "count",
+ "report_function": "Sum",
+ "report_name": "Today Absent",
+ "show_percentage_stats": 1,
+ "stats_time_interval": "Daily",
+ "type": "Report"
+}

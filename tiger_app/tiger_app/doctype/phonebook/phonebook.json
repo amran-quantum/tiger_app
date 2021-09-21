@@ -1,34 +1,32 @@
 {
  "actions": [],
- "creation": "2021-08-22 15:10:54.400178",
+ "creation": "2021-09-20 18:03:12.282696",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "fruit_name",
-  "point"
+  "fullname",
+  "code"
  ],
  "fields": [
   {
-   "fieldname": "fruit_name",
+   "fieldname": "fullname",
    "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Fruit Name",
-   "reqd": 1
+   "label": "Fullname"
   },
   {
-   "fieldname": "point",
+   "fieldname": "code",
    "fieldtype": "Data",
-   "label": "Point",
-   "reqd": 1
+   "label": "Code"
   }
  ],
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2021-09-20 17:48:54.992376",
+ "modified": "2021-09-20 18:03:22.436552",
  "modified_by": "Administrator",
  "module": "Tiger App",
- "name": "Chutney",
+ "name": "Phonebook",
  "owner": "Administrator",
  "permissions": [
   {

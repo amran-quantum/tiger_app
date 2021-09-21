@@ -1,0 +1,23 @@
+{
+ "aggregate_function_based_on": "",
+ "creation": "2021-09-21 13:20:08.664687",
+ "docstatus": 0,
+ "doctype": "Number Card",
+ "document_type": "Leave Application",
+ "dynamic_filters_json": "[]",
+ "filters_json": "[[\"Leave Application\",\"status\",\"=\",\"Approved\",false],[\"Leave Application\",\"from_date\",\"<=\",\"2021-09-21\",false],[\"Leave Application\",\"to_date\",\">=\",\"2021-09-21\",false]]",
+ "function": "Count",
+ "idx": 0,
+ "is_public": 1,
+ "is_standard": 1,
+ "label": "Employee Absent Today",
+ "modified": "2021-09-21 13:37:42.889925",
+ "modified_by": "Administrator",
+ "module": "Tiger App",
+ "name": "Employee Absent Today",
+ "owner": "Administrator",
+ "report_function": "Sum",
+ "show_percentage_stats": 0,
+ "stats_time_interval": "Daily",
+ "type": "Document Type"
+}

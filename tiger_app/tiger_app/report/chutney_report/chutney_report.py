@@ -8,16 +8,15 @@ from frappe import _
 
 
 def execute(filters=None):
-	columns, data = ["Fruit Name"], []
-	data = get_all(filters)
+	columns, data = ["Fruit Name","Point"], []
+	data = get_all()
 	return columns, data
 
-def get_all(filters):
+def get_all():
 	return frappe.db.sql(""" 
 		SELECT
- fruit_name
-FROM
- `tabChutney`
- WHERE fruit_name=%(fruit_name)s
-""",values=filters, as_dict=0)
+		 fruit_name, point
+		FROM
+		`tabChutney`
+		""")
 

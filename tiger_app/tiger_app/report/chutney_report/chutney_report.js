@@ -4,12 +4,12 @@
 
 frappe.query_reports["Chutney Report"] = {
 	"filters": [
-		{
-            "fieldname":"fruit_name",
-            "label": __("Fruit Name"),
-            "fieldtype": "Data",
-			"default": "",
-			"reqd": 1
-        }
+		// {
+        //     "fieldname":"fruit_name",
+        //     "label": __("Fruit Name"),
+        //     "fieldtype": "Data",
+		// 	"default": "",
+		// 	"reqd": 1
+        // }
 	]
 };
