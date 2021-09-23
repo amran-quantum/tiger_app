@@ -1,0 +1,111 @@
+{
+ "actions": [],
+ "creation": "2021-09-23 13:26:24.675983",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "department_policy_name",
+  "annual_leave_days",
+  "annual_leave_carry_over_days",
+  "annual_leave_encashment",
+  "column_break_column",
+  "casual_leave_days",
+  "payment_days",
+  "air_ticket_initial",
+  "air_ticket_duration",
+  "air_ticket_encashment_amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "annual_leave_days",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Annual Leave Days",
+   "reqd": 1
+  },
+  {
+   "fieldname": "casual_leave_days",
+   "fieldtype": "Int",
+   "label": "Casual Leave Days",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "annual_leave_encashment",
+   "fieldtype": "Check",
+   "label": "Annual Leave Encashment"
+  },
+  {
+   "fieldname": "annual_leave_carry_over_days",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Annual Leave Carry Over Days",
+   "reqd": 1
+  },
+  {
+   "fieldname": "payment_days",
+   "fieldtype": "Select",
+   "label": "Payment Days",
+   "options": "30 Days\nCalender Days",
+   "reqd": 1
+  },
+  {
+   "fieldname": "air_ticket_duration",
+   "fieldtype": "Select",
+   "label": "Air Ticket Duration",
+   "options": "Every Year\nEvery 2 Year",
+   "reqd": 1
+  },
+  {
+   "fieldname": "air_ticket_encashment_amount",
+   "fieldtype": "Currency",
+   "label": "Air Ticket Encashment Amount",
+   "reqd": 1
+  },
+  {
+   "fieldname": "department_policy_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Department Policy Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "air_ticket_initial",
+   "fieldtype": "Select",
+   "label": "Air Ticket Initial",
+   "options": "After 1 Year\nAfter 2 Year"
+  },
+  {
+   "fieldname": "column_break_column",
+   "fieldtype": "Column Break",
+   "label": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2021-09-23 13:44:31.950549",
+ "modified_by": "Administrator",
+ "module": "Tiger App",
+ "name": "Department Policy",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
