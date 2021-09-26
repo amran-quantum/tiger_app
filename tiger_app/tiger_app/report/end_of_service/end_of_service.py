@@ -3,7 +3,9 @@
 
 import frappe
 from datetime import date
+from datetime import datetime
 import calendar
+
 
 from frappe.utils.data import flt
 
@@ -14,7 +16,7 @@ def execute(filters=None):
 	row = []
 
 	for item in tdata:
-		item_break = item[4]
+		item_break = item[6]
 		sub_item = item_break[1:-1]
 		split_sub_item = sub_item.split(', {')
 		for elem in split_sub_item:
@@ -30,14 +32,14 @@ def execute(filters=None):
 					row.append(sc[:-1])
 			
 	for item in tdata:
-		item_break = item[4]
+		item_break = item[6]
 		sub_item = item_break[1:-1]
 		split_sub_item = sub_item.split(', {')
 		col = []
 		for el in row:
 			col.append({'amount':0,'sc':el})
 		today = date.today()
-		tdate = str(item[3]).split('-')
+		tdate = str(item[4]).split('-')
 		a = date(int(today.strftime("%Y")),int(today.strftime("%m")),int(today.strftime("%d")))
 		b = date(int(tdate[0]),int(tdate[1]),int(tdate[2]))
 
@@ -68,14 +70,65 @@ def execute(filters=None):
 			item.append(flt(col[idx]['amount']))
 		item.append(grat)
 		item.append(flt(days/365,2))
-		if days/365 > 1 or days/365 == 1:
-			item.append(1)
+		dp_check = frappe.get_list('Department Policy',filters={"department_policy_name": item[5]},fields={"air_ticket_initial"})
+		dp_year = 0
+		if len(dp_check)>0:
+			dp_year = int(dp_check[0].air_ticket_initial.split(' ')[1])
+		
+			te_amount = 0
+			if days/365 > dp_year or days/365 == dp_year:
+				te = frappe.get_list('Ticket Encashment',filters={"employee":item[1]},fields={"amount"})
+				if len(te)>0:
+					for el in te:
+						te_amount += int(el.amount)
+			item.append(te_amount)
 		else: item.append(0)
-		item.pop(4)
+
+		# leave encashment
+		leave_encashment = 0
+		yfd = datetime.now().date().replace(month=1, day=1)
+		yld = datetime.now().date().replace(month=12, day=31)
+		encashed_leave_type = frappe.get_list('Leave Type',filters={"allow_encashment":1},pluck="leave_type_name")
+		lv_al = frappe.get_list('Leave Allocation', 
+		filters={"employee":item[1],"leave_type": ('in',tuple(encashed_leave_type))},
+		 fields={"total_leaves_allocated"})
+		tot_leave = 0
+		for elem in lv_al:
+			tot_leave += elem.total_leaves_allocated
+		
+		lv_app = frappe.get_list('Leave Application', 
+		filters={"employee":item[1],"status":"Approved",
+		 "leave_type": ('in',tuple(encashed_leave_type))},
+		 fields={"total_leave_days"})
+
+		# current_year_leave_app = cyla
+		cyla = frappe.get_list('Leave Application', 
+		filters={"employee":item[1],"status":"Approved",
+		 "leave_type": ('in',tuple(encashed_leave_type)),
+		 "from_date":['>=',yfd],    
+		  "to_date": ['<=',yld]}, 
+		 fields={"total_leave_days"})
+		 
+		#  current_year_leave_app_till_today = cylatt
+		cylatt = frappe.get_list('Leave Application', 
+		filters={"employee":item[1],"status":"Approved",
+		 "leave_type": ('in',tuple(encashed_leave_type)),
+		  "to_date": ['<=',filters.ending_date]}, 
+		 fields={"total_leave_days"})
+
+
+		tot_taken_leave = 0
+		for el in lv_app:
+			tot_taken_leave += el.total_leave_days
+		leave_encashment = tot_leave - tot_taken_leave
+		
+		item.append(leave_encashment)
+		item.pop(6)
 
 	row.append("Gratuity")
 	row.append("Work Duration(Years)")
 	row.append("Ticket")
+	row.append("Leave Encashment")
 	columns += row
 
 	
@@ -92,7 +145,7 @@ def in_dictlist(key, value, my_dictlist):
 
 def get_columns():
 	
-	columns = ["Department Code","Employee Name","Salary Structure","Date of Joining","Department"]
+	columns = ["Department Code","Employee","Employee Name","Salary Structure","Date of Joining","Department"]
 	
 	return columns
 
@@ -157,5 +210,6 @@ def get_emp_list(filters):
 		for item in emp_list:
 			if item.employee not in names:
 				names += item.employee
-				rdata.append([item.department_code,item.employee_name, item.salary_structure, item.date_of_joining, item.sales, item.department[:-4]])
+				dep = item.department[:-4]
+				rdata.append([item.department_code, item.employee, item.employee_name, item.salary_structure, item.date_of_joining, dep, item.sales])
 		return rdata
