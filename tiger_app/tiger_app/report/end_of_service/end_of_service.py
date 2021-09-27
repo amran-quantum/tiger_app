@@ -32,63 +32,11 @@ def execute(filters=None):
 					row.append(sc[:-1])
 			
 	for item in tdata:
-		item_break = item[6]
-		sub_item = item_break[1:-1]
-		split_sub_item = sub_item.split(', {')
-		col = []
-		for el in row:
-			col.append({'amount':0,'sc':el})
-		today = date.today()
-		tdate = str(item[4]).split('-')
-		a = date(int(today.strftime("%Y")),int(today.strftime("%m")),int(today.strftime("%d")))
-		b = date(int(tdate[0]),int(tdate[1]),int(tdate[2]))
-
-		days = (a-b).days
-		grat = 0
-		for elem in split_sub_item:
-			if elem.count('{')==0:
-				csse = elem[:-1].split(',')
-				amount = csse[0].split(':')[1]
-				sc = csse[1].split(':')[1][1:-1]
-				if sc[:-1] == 'Basic':
-					index = in_dictlist('sc',sc[:-1], col)
-					if days/365 > 1 or days/365 == 1:
-						grat = flt((flt(amount) / 30)*21 * (days/365),2)
-					col[index].update({'amount':amount})
-			else:
-				esse = elem[1:-1].split(',')
-				amount = esse[0].split(':')[1]
-				sc = esse[1].split(':')[1][1:-1]
-				if sc[:-1] == 'Basic':
-					index = in_dictlist('sc',sc[:-1], col)
-					if days/365 > 1 or days/365 == 1:
-						grat = flt((flt(amount) / 30)*21 * (days/365),2)
-					col[index].update({'amount':amount})
-		
-        	
-		for idx,value in enumerate(row):
-			item.append(flt(col[idx]['amount']))
-		item.append(grat)
-		item.append(flt(days/365,2))
-		dp_check = frappe.get_list('Department Policy',filters={"department_policy_name": item[5]},fields={"air_ticket_initial"})
-		dp_year = 0
-		if len(dp_check)>0:
-			dp_year = int(dp_check[0].air_ticket_initial.split(' ')[1])
-		
-			te_amount = 0
-			if days/365 > dp_year or days/365 == dp_year:
-				te = frappe.get_list('Ticket Encashment',filters={"employee":item[1]},fields={"amount"})
-				if len(te)>0:
-					for el in te:
-						te_amount += int(el.amount)
-			item.append(te_amount)
-		else: item.append(0)
-
 		# leave encashment
 		leave_encashment = 0
 		yfd = datetime.now().date().replace(month=1, day=1)
 		yld = datetime.now().date().replace(month=12, day=31)
-		encashed_leave_type = frappe.get_list('Leave Type',filters={"allow_encashment":1},pluck="leave_type_name")
+		encashed_leave_type = frappe.get_list('Leave Type',filters={"leave_type_name":['like', '%Annual%']},pluck="leave_type_name")
 		lv_al = frappe.get_list('Leave Allocation', 
 		filters={"employee":item[1],"leave_type": ('in',tuple(encashed_leave_type))},
 		 fields={"total_leaves_allocated"})
@@ -108,7 +56,10 @@ def execute(filters=None):
 		 "from_date":['>=',yfd],    
 		  "to_date": ['<=',yld]}, 
 		 fields={"total_leave_days"})
-		 
+		cyla_total = 0
+		for e in cyla:
+			cyla_total = cyla_total + e.total_leave_days
+
 		#  current_year_leave_app_till_today = cylatt
 		cylatt = frappe.get_list('Leave Application', 
 		filters={"employee":item[1],"status":"Approved",
@@ -116,19 +67,100 @@ def execute(filters=None):
 		  "to_date": ['<=',filters.ending_date]}, 
 		 fields={"total_leave_days"})
 
+		cylatt_total = 0
+		for e in cylatt:
+			cylatt_total = cylatt_total + e.total_leave_days
+			
+		# current year leave app extra = cylax
+		cylax = cyla_total - cylatt_total
 
 		tot_taken_leave = 0
 		for el in lv_app:
 			tot_taken_leave += el.total_leave_days
 		leave_encashment = tot_leave - tot_taken_leave
+        #leave encashment ends
+
+		grand_total = 0
+		item_break = item[6]
+		sub_item = item_break[1:-1]
+		split_sub_item = sub_item.split(', {')
+		col = []
+		for el in row:
+			col.append({'amount':0,'sc':el})
+		today = date.today()
+		tdate = str(item[4]).split('-')
+		a = date(int(today.strftime("%Y")),int(today.strftime("%m")),int(today.strftime("%d")))
+		b = date(int(tdate[0]),int(tdate[1]),int(tdate[2]))
+
+		days = (a-b).days - cylax
+		grat = 0
+		one_day_amount = 0
+		for elem in split_sub_item:
+			if elem.count('{')==0:
+				csse = elem[:-1].split(',')
+				amount = csse[0].split(':')[1]
+				sc = csse[1].split(':')[1][1:-1]
+				if sc[:-1] == 'Basic':
+					index = in_dictlist('sc',sc[:-1], col)
+					if days/365 > 1 or days/365 == 1:
+						one_day_amount = flt(amount) / 30
+						grat = flt((one_day_amount)*21 * (days/365),2)
+					col[index].update({'amount':amount})
+			else:
+				esse = elem[1:-1].split(',')
+				amount = esse[0].split(':')[1]
+				sc = esse[1].split(':')[1][1:-1]
+				if sc[:-1] == 'Basic':
+					index = in_dictlist('sc',sc[:-1], col)
+					if days/365 > 1 or days/365 == 1:
+						one_day_amount = flt(amount) / 30
+						grat = flt((one_day_amount)*21 * (days/365),2)
+					col[index].update({'amount':amount})
+		
+			
+		for idx,value in enumerate(row):
+			item.append(flt(col[idx]['amount']))
+		item.append(grat)
+		item.append(flt(days/365,2))
+		department_list = frappe.get_list('Department',filters={"department_name":item[5]},fields={"department_name","department_policy_name"})
+		if len(department_list)>0:
+			dp_check = frappe.get_list('Department Policy',filters={"department_policy_name": department_list[0].department_policy_name},fields={"air_ticket_initial"})
+			dp_year = 0
+			t_quantity = 0
+			te_amount = 0
+			if len(dp_check)>0:
+				dp_year = int(dp_check[0].air_ticket_initial.split(' ')[1])
+			
+				if days/365 > dp_year or days/365 == dp_year:
+					te = frappe.get_list('Ticket Encashment',filters={"employee":item[1]},fields={"amount"})
+					if len(te)>0:
+						t_quantity = len(te)
+						for el in te:
+							te_amount += int(el.amount)
+				item.append(te_amount)
+				item.append(t_quantity)
+			else: 
+				item.append(0)
+				item.append(0)
+		else: 
+			item.append(0)
+			item.append(0)
+
+		
 		
 		item.append(leave_encashment)
+		item.append(leave_encashment*one_day_amount)
+		grand_total = grat + te_amount + (leave_encashment*one_day_amount)
+		item.append(grand_total)
 		item.pop(6)
 
 	row.append("Gratuity")
 	row.append("Work Duration(Years)")
-	row.append("Ticket")
-	row.append("Leave Encashment")
+	row.append("Ticket(amount)")
+	row.append("Ticket(quantity)")
+	row.append("Leave Encashment(days)")
+	row.append("Leave Encashment(amount)")
+	row.append("Total")
 	columns += row
 
 	
@@ -207,9 +239,10 @@ def get_emp_list(filters):
 		""" % cond, {"sal_struct": tuple(sal_struct), "from_date": filters.ending_date, "payroll_payable_account": "Payroll Payable - T"}, as_dict=True)
 		rdata = []
 		names = ""
+		
 		for item in emp_list:
 			if item.employee not in names:
 				names += item.employee
-				dep = item.department[:-4]
+				dep = item.department.split('-')[0]
 				rdata.append([item.department_code, item.employee, item.employee_name, item.salary_structure, item.date_of_joining, dep, item.sales])
 		return rdata
