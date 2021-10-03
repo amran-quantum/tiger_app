@@ -6,8 +6,8 @@ import frappe
 def execute(filters=None):
 	columns, data = [], []
 
-	columns = get_columns()
-	data = get_data(filters)
+	columns, leave_type_list = get_columns()
+	data = get_data(filters,leave_type_list)
 	return columns, data
 def get_columns():
 	leave_type_list = frappe.db.sql("""
@@ -17,44 +17,33 @@ def get_columns():
 	for el in leave_type_list:
 		cols.append(el.leave_type+" Start")
 		cols.append(el.leave_type+" End")
-		cols.append("Total")
-	return cols
-	# return []
+		cols.append(el.leave_type+" Total")
+	return cols,leave_type_list
 
-	
-
-def get_data(filters):
+def get_data(filters,leave_type_list):
 	data = frappe.db.sql("""
 	select employee, employee_name, leave_type, from_date, to_date, total_leave_days from `tabLeave Application` where from_date >= %(from_date)s  and to_date <= %(to_date)s and status=%(status)s
-	""",{"from_date":filters.from_date,"to_date":filters.to_date,"status":"Approved"},as_dict=1)
-	
-	leave_type_list = frappe.db.sql("""select distinct leave_type from `tabLeave Allocation`""",as_dict=True)
-	employee_list = frappe.db.sql("""select distinct employee, employee_name from `tabLeave Allocation`""",as_dict=True)
+	order by employee, leave_type asc""",{"from_date":filters.from_date,"to_date":filters.to_date,"status":"Approved"},as_dict=1)
 	
 	result = []
-	for em in employee_list:
-		edata = []
-		for elem in data:
-			if elem.employee == em.employee:
-				edata.append(elem)
-		sorted_row = []
-		for el in edata:
-			if not any(el.employee in d for d in result):
-				sorted_row.append(el.employee)
-				sorted_row.append(el.employee_name)
-			else:
-				sorted_row.append("")
-				sorted_row.append("")
+	for idx,item in enumerate(data):
+		row = []
+		row.append(item.employee)
+		row.append(item.employee_name)
 
-			for item in leave_type_list:
-				if item.leave_type == el.leave_type:
-					sorted_row.append(el.from_date)
-					sorted_row.append(el.to_date)
-					sorted_row.append(el.total_leave_days)
-				else:
-					sorted_row.append("")
-					sorted_row.append("")
-					sorted_row.append("")
-			result.append(sorted_row)
-			# frappe.msgprint(str(sorted_row))
+		for litem in leave_type_list:
+			row.append("")
+			row.append("")
+			row.append("")
+		for index,ritem in enumerate(leave_type_list):
+			if ritem.leave_type == item.leave_type:
+				row[2+ 3*index] = item.from_date
+				row[3+ 3*index] = item.to_date
+				row[4+ 3*index] = item.total_leave_days
+		result.append(row)
+	
+					
+
+
+		
 	return result
