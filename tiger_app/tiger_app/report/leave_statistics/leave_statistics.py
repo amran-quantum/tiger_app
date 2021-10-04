@@ -69,20 +69,22 @@ def get_data(filters,leave_type_list):
 		result.append(row)
 	
 	# data arrangement from the top
-	for elem in range((len(result)-1),0,-1):
-		if result[elem][0] == result[elem - 1][0] and elem != 0:
-			for i in range(len(leave_type_list)):
-				if result[elem][2+ 3*i] != "" and result[elem - 1][2+ 3*i ]== "":
-					temp = result[elem][2+ 3*i]
-					result[elem - 1][2+ 3*i] = temp
-					result[elem][2+ 3*i] = ""
-					temp2 = result[elem][3+ 3*i]
-					result[elem - 1][3+ 3*i] = temp2
-					result[elem][3+ 3*i] = ""
-					temp3 = result[elem][4+ 3*i]
-					result[elem - 1][4+ 3*i] = temp3
-					result[elem][4+ 3*i] = ""
 
+	for i in range(len(leave_type_list)):
+		for elem in range((len(result)-1),0,-1):
+			if result[elem][0] == result[elem - 1][0] and elem != 0:
+				for i in range(len(leave_type_list)):
+					if result[elem][2+ 3*i] != "" and result[elem - 1][2+ 3*i ] == "":
+						temp = result[elem][2+ 3*i]
+						result[elem - 1][2+ 3*i] = temp
+						result[elem][2+ 3*i] = ""
+						temp2 = result[elem][3+ 3*i]
+						result[elem - 1][3+ 3*i] = temp2
+						result[elem][3+ 3*i] = ""
+						temp3 = result[elem][4+ 3*i]
+						result[elem - 1][4+ 3*i] = temp3
+						result[elem][4+ 3*i] = ""
+	
 
 	# empty data elimination
 	for elem in range((len(result)-1),0,-1):
