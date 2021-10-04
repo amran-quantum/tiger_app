@@ -10,14 +10,31 @@ def execute(filters=None):
 	data = get_data(filters,leave_type_list)
 	return columns, data
 def get_columns():
-	leave_type_list = frappe.db.sql("""
+	leave_type_list_from_db = frappe.db.sql("""
 	select distinct leave_type from `tabLeave Allocation` order by leave_type asc
 	""",as_dict=True)
+	leave_type_list = []
+	count = 0
+	for el in leave_type_list_from_db:
+		if "Annual" in el.leave_type:
+			el.leave_type = "Annual Leave"
+			count = count + 1
+			if count < 2:
+				leave_type_list.append(el)
+		else: leave_type_list.append(el)
+
+
 	cols = ["Employee","Employee Name"]
 	for el in leave_type_list:
-		cols.append(el.leave_type+" Start")
-		cols.append(el.leave_type+" End")
-		cols.append(el.leave_type+" Total")
+		if "Annual" in el.leave_type:
+			cols.append("Annual Leave Start")
+			cols.append("Annual Leave End")
+			cols.append("Annual Leave Total")
+		else:
+			cols.append(el.leave_type+" Start")
+			cols.append(el.leave_type+" End")
+			cols.append(el.leave_type+" Total")
+			
 	return cols,leave_type_list
 
 def get_data(filters,leave_type_list):
@@ -36,7 +53,11 @@ def get_data(filters,leave_type_list):
 			row.append("")
 			row.append("")
 		for index,ritem in enumerate(leave_type_list):
-			if ritem.leave_type == item.leave_type:
+			if "Annual" in ritem.leave_type and "Annual" in item.leave_type:
+				row[2+ 3*index] = item.from_date
+				row[3+ 3*index] = item.to_date
+				row[4+ 3*index] = item.total_leave_days
+			elif ritem.leave_type == item.leave_type:
 				row[2+ 3*index] = item.from_date
 				row[3+ 3*index] = item.to_date
 				row[4+ 3*index] = item.total_leave_days
