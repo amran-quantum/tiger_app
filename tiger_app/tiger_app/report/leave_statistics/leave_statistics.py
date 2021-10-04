@@ -26,7 +26,7 @@ def get_data(filters,leave_type_list):
 	order by employee, leave_type asc""",{"from_date":filters.from_date,"to_date":filters.to_date,"status":"Approved"},as_dict=1)
 	
 	result = []
-	for idx,item in enumerate(data):
+	for item in data:
 		row = []
 		row.append(item.employee)
 		row.append(item.employee_name)
@@ -42,8 +42,41 @@ def get_data(filters,leave_type_list):
 				row[4+ 3*index] = item.total_leave_days
 		result.append(row)
 	
+	# data arrangement from the top
+	for elem in range((len(result)-1),0,-1):
+		if result[elem][0] == result[elem - 1][0] and elem != 0:
+			for i in range(len(leave_type_list)):
+				if result[elem][2+ 3*i] != "" and result[elem - 1][2+ 3*i ]== "":
+					temp = result[elem][2+ 3*i]
+					result[elem - 1][2+ 3*i] = temp
+					result[elem][2+ 3*i] = ""
+					temp2 = result[elem][3+ 3*i]
+					result[elem - 1][3+ 3*i] = temp2
+					result[elem][3+ 3*i] = ""
+					temp3 = result[elem][4+ 3*i]
+					result[elem - 1][4+ 3*i] = temp3
+					result[elem][4+ 3*i] = ""
+
+
+	# empty data elimination
+	for elem in range((len(result)-1),0,-1):
+		flag = 0
+		if elem != 0:
+			for i in range(len(leave_type_list)):
+				if result[elem][2+ 3*i] != "":
+					flag = flag + 1
+		if flag == 0:
+			result.pop(elem)
+	
+	# name correction
+	for elem in range((len(result)-1),0,-1):
+		if result[elem][0] == result[elem - 1][0] and elem != 0:
+			result[elem][0] = ""
+			result[elem][1] = ""
 					
-
-
+	
+			
+		 
+					
 		
 	return result
