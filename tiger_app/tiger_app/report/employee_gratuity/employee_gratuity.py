@@ -120,17 +120,21 @@ def execute(filters=None):
 			
 		for idx,value in enumerate(row):
 			item.append(flt(col[idx]['amount']))
-		item.append(grat)
+		item.append(round(grat))
+		item.append(days)
 		
-		item.pop(6)
-		item.pop(3)
-		item.pop(3)
+		item.pop(1)
+		item.pop(5)
+		item.pop(2)
+		# item.pop(3)
 
 	row.append("Gratuity")
+	row.append("Days in Service")
 	
 	columns += row
-	columns.pop(3)
-	columns.pop(3)
+	columns.pop(1)
+	columns.pop(2)
+	# columns.pop(3)
 
 	
 	data = tdata

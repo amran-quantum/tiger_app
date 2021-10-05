@@ -4,6 +4,7 @@
 import frappe
 from frappe import _
 from datetime import datetime
+from datetime import date
 
 def execute(filters=None):
 	columns, data = [], []
@@ -41,6 +42,7 @@ def execute(filters=None):
 			else:
 				leave_details = frappe.db.sql("""select * from `tabLeave Allocation` where leave_type=%(ltn)s and employee_name=%(emp_name)s""",{"ltn":e,"emp_name":item.employee_name},as_dict=1)
 				ldata = e
+			
 			leave_application = frappe.get_list('Leave Application',
 			filters={"employee_name": item.employee_name,
 						"status": "Approved",
@@ -49,27 +51,41 @@ def execute(filters=None):
 						"to_date": ['<=', filters.to_date]},
 			fields={"total_leave_days"}
 						)
+			# acm_date = filters.acm_date.split('-')
+			# a = date(int(acm_date[0]),int(acm_date[1]),int(acm_date[2]))
+			# today = date.today()
+			# b = date(int(today.strftime("%Y")),1,1)
+			# acm = (a-b).days
+			# acm = (leave_details[0].total_leaves_allocated / 365)*acm + (leave_details[0].carry_forwarded_leaves_count or 0)
+			# acm = round(acm)
+			# row.append(acm)
 			if len(leave_application)> 0: 			
 				total = leave_details[0].total_leaves_allocated
+				cf = leave_details[0].carry_forwarded_leaves_count
 				taken = 0
 
 				for elem in leave_application:
 					taken += elem.total_leave_days
-				remaining = total - taken
+				remaining = (cf or 0)+ total - taken
+
+				# row.append(cf or 0)
 				row.append(total)
 				row.append(taken)
 				row.append(remaining)
 			else:
+
 
 				if "Annual" in e:
 					leave_allocation = frappe.db.count('Leave Allocation', {'employee_name':item.employee_name,'leave_type':['like', '%Annual%'] })
 				else:
 					leave_allocation = frappe.db.count('Leave Allocation', {'employee_name':item.employee_name,'leave_type': e })
 				if leave_allocation > 0:
+					# row.append(leave_details[0].carry_forwarded_leaves_count or 0)
 					row.append(leave_details[0].total_leaves_allocated)
 					row.append(0)
-					row.append(leave_details[0].total_leaves_allocated)
+					row.append((leave_details[0].carry_forwarded_leaves_count or 0)+leave_details[0].total_leaves_allocated)
 				else:
+					# row.append(0)
 					row.append(0)
 					row.append(0)
 					row.append(0)
@@ -82,7 +98,9 @@ def execute(filters=None):
 def get_columns():
 	columns = [
 		 _("Department Code") + "::140",
-		 _("Employee Name") + "::140"
+		 _("Employee Name") + "::140",
+		#  _("Accumulation") + "::140",
+		#  _("Annual Leave Carry Forward") + "::140"
 	]
 	leave_types = {_("lt_list"): []}
 	leave_allocation = frappe.db.sql("""select distinct leave_type from `tabLeave Allocation`""",as_dict=1)
@@ -94,7 +112,7 @@ def get_columns():
 		else:
 			leave_types[_("lt_list")].append(component.leave_type_name)
 
-	columns = columns + [(e +" "+ f + "::120") for e in leave_types[_("lt_list")] for f in ["Total","Taken","Remaining"] ]
+	columns = columns + [(e +" "+ f + "::120") for e in leave_types[_("lt_list")] for f in ["Allocation","Taken","Balance"] ]
 
 	return columns, leave_types[_("lt_list")]
 

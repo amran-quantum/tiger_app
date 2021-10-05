@@ -14,14 +14,14 @@ frappe.query_reports["Employee Leave By Allocation"] = {
 			"fieldtype": "Select",
 			"options": years,
 			"width": "50"
-		}
-		// {
-		// 	"fieldname":"from_date",
-		// 	"label": __("From Date"),
-		// 	"fieldtype": "Date",
-		// 	"reqd": 1,
-		// 	"default": frappe.datetime.year_start()
-		// },
+		},
+		{
+			"fieldname":"acm_date",
+			"label": __("Accumulation Date"),
+			"fieldtype": "Date",
+			"reqd": 1,
+			"default": frappe.datetime.get_today()
+		},
 		// {
 		// 	"fieldname":"to_date",
 		// 	"label": __("To Date"),

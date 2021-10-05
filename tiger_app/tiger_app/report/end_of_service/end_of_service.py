@@ -215,7 +215,7 @@ def get_emp_list(filters):
 				and currency = %(currency)s and
 				ifnull(salary_slip_based_on_timesheet,0) = %(salary_slip_based_on_timesheet)s
 				{condition}""".format(condition=condition),
-			{"company": "test", "currency": "BDT", "salary_slip_based_on_timesheet":0})
+			{"company": "Human Capital Group", "currency": "BDT", "salary_slip_based_on_timesheet":0})
 	if sal_struct:
 		cond += "and t2.salary_structure IN %(sal_struct)s "
 		cond += "and t2.payroll_payable_account = %(payroll_payable_account)s "
