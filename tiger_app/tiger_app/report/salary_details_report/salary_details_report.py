@@ -4,6 +4,7 @@
 import frappe
 from datetime import date
 import calendar
+from frappe import _
 
 from frappe.utils.data import flt
 
@@ -14,7 +15,7 @@ def execute(filters=None):
 	row = []
 
 	for item in tdata:
-		item_break = item[4]
+		item_break = item[5]
 		sub_item = item_break[1:-1]
 		split_sub_item = sub_item.split(', {')
 		for elem in split_sub_item:
@@ -31,7 +32,7 @@ def execute(filters=None):
 			
 	row.sort()
 	for item in tdata:
-		item_break = item[4]
+		item_break = item[5]
 		sub_item = item_break[1:-1]
 		split_sub_item = sub_item.split(', {')
 		col = []
@@ -59,7 +60,7 @@ def execute(filters=None):
 			total = total + flt(col[idx]['amount'])
 		item.append(total)
 
-		item.pop(4)
+		item.pop(5)
 
 	row.append("Total")
 	columns += row
@@ -78,7 +79,7 @@ def in_dictlist(key, value, my_dictlist):
 
 def get_columns():
 	
-	columns = ["Department Code","Employee Name","Salary Structure","Date of Joining"]
+	columns = ["Department Code",_("Employee")+":Link/Employee:140","Employee Name","Salary Structure","Date of Joining"]
 	
 	return columns
 
@@ -136,12 +137,12 @@ def get_emp_list(filters):
 				t1.name = t2.employee
 				and t2.docstatus = 1
 				and t1.status = "Active"
-		%s order by t2.from_date desc
+		%s order by t1.department_code asc, t2.from_date desc
 		""" % cond, {"sal_struct": tuple(sal_struct), "from_date": filters.ending_date, "payroll_payable_account": "Payroll Payable - T"}, as_dict=True)
 		rdata = []
 		names = ""
 		for item in emp_list:
 			if item.employee not in names:
 				names += item.employee
-				rdata.append([item.department_code,item.employee_name, item.salary_structure, item.date_of_joining, item.sales])
+				rdata.append([item.department_code,item.employee,item.employee_name, item.salary_structure, item.date_of_joining, item.sales])
 		return rdata

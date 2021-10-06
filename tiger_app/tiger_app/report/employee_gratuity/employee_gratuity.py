@@ -5,7 +5,7 @@ import frappe
 from datetime import date
 from datetime import datetime
 import calendar
-
+from frappe import _
 
 from frappe.utils.data import flt
 
@@ -123,18 +123,18 @@ def execute(filters=None):
 		item.append(round(grat))
 		item.append(days)
 		
-		item.pop(1)
-		item.pop(5)
-		item.pop(2)
-		# item.pop(3)
+		# item.pop(1)
+		item.pop(6)
+		# item.pop(2)
+		item.pop(3)
 
 	row.append("Gratuity")
 	row.append("Days in Service")
 	
 	columns += row
-	columns.pop(1)
-	columns.pop(2)
-	# columns.pop(3)
+	# columns.pop(1)
+	# columns.pop(2)
+	columns.pop(3)
 
 	
 	data = tdata
@@ -150,7 +150,7 @@ def in_dictlist(key, value, my_dictlist):
 
 def get_columns():
 	
-	columns = ["Department Code","Employee","Employee Name","Salary Structure","Date of Joining","Department"]
+	columns = ["Department Code",_("Employee")+":Link/Employee:140","Employee Name","Salary Structure","Date of Joining","Department"]
 	
 	return columns
 
@@ -208,7 +208,7 @@ def get_emp_list(filters):
 				t1.name = t2.employee
 				and t2.docstatus = 1
 				and t1.status = "Active"
-		%s order by t2.from_date desc
+		%s order by t1.department_code asc, t2.from_date desc
 		""" % cond, {"sal_struct": tuple(sal_struct), "from_date": filters.ending_date, "payroll_payable_account": "Payroll Payable - T"}, as_dict=True)
 		rdata = []
 		names = ""

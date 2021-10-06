@@ -33,7 +33,7 @@ def execute(filters=None):
 	# }
 	fdata = get_data(filters)
 	for item in fdata:
-		row = [item.department_code,item.employee_name]
+		row = [item.department_code, item.employee, item.employee_name]
 
 		for elem in leave_types:
 			if "Annual" in elem:
@@ -119,6 +119,7 @@ def execute(filters=None):
 def get_columns():
 	columns = [
 		 _("Department Code") + "::140",
+		 _("Employee") + ":Link/Employee:140",
 		 _("Employee Name") + "::140",
 		 _("Accumulation") + "::140",
 		 _("Ballance from last year") + "::140"
