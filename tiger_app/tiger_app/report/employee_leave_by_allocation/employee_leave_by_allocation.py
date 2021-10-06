@@ -142,7 +142,7 @@ def get_data(filters):
 	data = frappe.db.sql(
 		"""
 		select distinct ta.employee_name, ta.employee, em.department_code from `tabLeave Allocation` ta, `tabEmployee` em where from_date>=%(from_date)s and to_date<=%(to_date)s and ta.employee_name=em.employee_name
-		"""
+		 order by em.department_code asc"""
 	,{"from_date":filters.from_date, "to_date":filters.to_date},as_dict=1)
 	
 	return data
