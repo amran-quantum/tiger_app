@@ -10,9 +10,10 @@ frappe.query_reports["Employee Leave By Allocation"] = {
 	"filters": [
 		{
 			"fieldname":"year",
-			"label": __("")+ frappe.datetime.year_end().substring(0,4),
+			"label": __("Year"),
 			"fieldtype": "Select",
 			"options": years,
+			"default": frappe.datetime.year_end().substring(0,4),
 			"width": "50"
 		},
 		{
