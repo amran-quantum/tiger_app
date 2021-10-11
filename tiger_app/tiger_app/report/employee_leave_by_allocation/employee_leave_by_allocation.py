@@ -8,8 +8,6 @@ from datetime import date
 
 def execute(filters=None):
 	columns, data = [], []
-
-	columns, leave_types = get_columns()
 	columns.append("Unpaid Leave")
 	if filters.year:
 		filters.update({
@@ -22,13 +20,14 @@ def execute(filters=None):
 			'to_date': datetime.now().date().replace(month=12, day=31)
 		})
 	
+	columns, leave_types = get_columns(filters)
 	fdata = get_data(filters)
 	for item in fdata:
 		row = [item.department_code, item.employee, item.employee_name]
 
 		for elem in leave_types:
 			if "Annual" in elem:
-				lal_details = frappe.get_list('Leave Allocation', filters={'employee':item.employee,'leave_type':['like', '%Annual%'] }, fields={'leave_type','total_leaves_allocated','unused_leaves'})
+				lal_details = frappe.get_list('Leave Allocation', filters={'employee':item.employee,'from_date':['>=',filters.from_date],'to_date':['<=',filters.to_date],'leave_type':['like', '%Annual%'] }, fields={'leave_type','total_leaves_allocated','unused_leaves'})
 				cf = lal_details[0].unused_leaves
 
 		acm_date = filters.acm_date.split('-')
@@ -44,10 +43,10 @@ def execute(filters=None):
 		for e in leave_types:
 			ldata = ""
 			if "Annual" in e:
-				leave_details = frappe.get_list('Leave Allocation', filters={'employee':item.employee,'leave_type':['like', '%Annual%'] }, fields={'leave_type','total_leaves_allocated'})
+				leave_details = frappe.get_list('Leave Allocation', filters={'employee':item.employee,'from_date':['>=',filters.from_date],'to_date':['<=',filters.to_date],'leave_type':['like', '%Annual%'] }, fields={'leave_type','total_leaves_allocated'})
 				ldata = leave_details[0].leave_type
 			else:
-				leave_details = frappe.db.sql("""select * from `tabLeave Allocation` where leave_type=%(ltn)s and employee=%(employee)s""",{"ltn":e,"employee":item.employee},as_dict=1)
+				leave_details = frappe.db.sql("""select * from `tabLeave Allocation` where from_date >= %(from_date)s and to_date <= %(to_date)s and leave_type=%(ltn)s and employee=%(employee)s""",{"from_date":filters.from_date, "to_date":filters.to_date,"ltn":e,"employee":item.employee},as_dict=1)
 				ldata = e
 			
 			leave_application = frappe.get_list('Leave Application',
@@ -73,9 +72,9 @@ def execute(filters=None):
 				row.append(remaining)
 			else:
 				if "Annual" in e:
-					leave_allocation = frappe.db.count('Leave Allocation', {'employee':item.employee,'leave_type':['like', '%Annual%'] })
+					leave_allocation = frappe.db.count('Leave Allocation', {'employee':item.employee,'from_date':['>=',filters.from_date],'to_date':['<=',filters.to_date],'leave_type':['like', '%Annual%'] })
 				else:
-					leave_allocation = frappe.db.count('Leave Allocation', {'employee':item.employee,'leave_type': e })
+					leave_allocation = frappe.db.count('Leave Allocation', {'employee':item.employee,'from_date':['>=',filters.from_date],'to_date':['<=',filters.to_date],'leave_type': e })
 				if leave_allocation > 0:
 					row.append(leave_details[0].total_leaves_allocated)
 					row.append(0)
@@ -107,7 +106,7 @@ def execute(filters=None):
 	return columns, data
 
 
-def get_columns():
+def get_columns(filters):
 	columns = [
 		 _("Department Code") + "::140",
 		 _("Employee") + ":Link/Employee:140",
@@ -116,7 +115,7 @@ def get_columns():
 		 _("Ballance from last year") + "::140"
 	]
 	leave_types = {_("lt_list"): []}
-	leave_allocation = frappe.db.sql("""select distinct leave_type from `tabLeave Allocation`""",as_dict=1)
+	leave_allocation = frappe.db.sql("""select distinct leave_type from `tabLeave Allocation` where from_date >= %(from_date)s and to_date <= %(to_date)s""",{"from_date":filters.from_date, "to_date":filters.to_date},as_dict=1)
 	for component in frappe.db.sql("""select leave_type_name from `tabLeave Type` where leave_type_name in (%s)"""%
 		(', '.join(['%s']*len(leave_allocation))), tuple([d.leave_type for d in leave_allocation]),as_dict=1):
 		if 'Annual' in component.leave_type_name:
