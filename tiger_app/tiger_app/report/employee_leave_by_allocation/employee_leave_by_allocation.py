@@ -21,31 +21,22 @@ def execute(filters=None):
 			'from_date':datetime.now().date().replace(month=1, day=1),    
 			'to_date': datetime.now().date().replace(month=12, day=31)
 		})
-	# fy = frappe.get_list('Fiscal Year',fields={'year_start_date','year_end_date'})
-	# filters.update({
-	# 	'from_date': fy[0].year_start_date,
-	# 	'to_date': fy[0].year_end_date
-	# })
-	# frappe.msgprint(str(filters))
-	# filters = {
-	# 	'from_date': str(fy[0].year_start_date),
-	# 	'to_date': str(fy[0].year_end_date)
-	# }
+	
 	fdata = get_data(filters)
 	for item in fdata:
 		row = [item.department_code, item.employee, item.employee_name]
 
 		for elem in leave_types:
 			if "Annual" in elem:
-				lal_details = frappe.get_list('Leave Allocation', filters={'employee':item.employee,'leave_type':['like', '%Annual%'] }, fields={'leave_type','total_leaves_allocated','carry_forwarded_leaves_count'})
-				cf = lal_details[0].carry_forwarded_leaves_count
+				lal_details = frappe.get_list('Leave Allocation', filters={'employee':item.employee,'leave_type':['like', '%Annual%'] }, fields={'leave_type','total_leaves_allocated','unused_leaves'})
+				cf = lal_details[0].unused_leaves
 
 		acm_date = filters.acm_date.split('-')
 		a = date(int(acm_date[0]),int(acm_date[1]),int(acm_date[2]))
 		today = date.today()
 		b = date(int(today.strftime("%Y")),1,1)
 		acm = (a-b).days
-		acm = (lal_details[0].total_leaves_allocated / 365)*acm + (lal_details[0].carry_forwarded_leaves_count or 0)
+		acm = (lal_details[0].total_leaves_allocated / 365)*acm + (lal_details[0].unused_leaves or 0)
 		acm = round(acm)
 		row.append(acm)
 		row.append(cf)
@@ -70,7 +61,7 @@ def execute(filters=None):
 			
 			if len(leave_application)> 0: 			
 				total = leave_details[0].total_leaves_allocated
-				cf = leave_details[0].carry_forwarded_leaves_count
+				cf = leave_details[0].unused_leaves
 				taken = 0
 
 				for elem in leave_application:
@@ -88,7 +79,7 @@ def execute(filters=None):
 				if leave_allocation > 0:
 					row.append(leave_details[0].total_leaves_allocated)
 					row.append(0)
-					row.append((leave_details[0].carry_forwarded_leaves_count or 0)+leave_details[0].total_leaves_allocated)
+					row.append((leave_details[0].unused_leaves or 0)+leave_details[0].total_leaves_allocated)
 				else:
 					row.append(0)
 					row.append(0)

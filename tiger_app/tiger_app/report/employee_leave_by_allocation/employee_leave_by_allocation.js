@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 /* eslint-disable */
 let years = []
-for(let i=2016;i<2026;i++){
+for(let i=2012;i<2033;i++){
 	years.push(""+i)
 }
 
@@ -10,7 +10,7 @@ frappe.query_reports["Employee Leave By Allocation"] = {
 	"filters": [
 		{
 			"fieldname":"year",
-			"label": __("year"),
+			"label": __("")+ frappe.datetime.year_end().substring(0,4),
 			"fieldtype": "Select",
 			"options": years,
 			"width": "50"

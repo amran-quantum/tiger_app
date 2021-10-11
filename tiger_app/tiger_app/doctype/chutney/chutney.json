@@ -6,7 +6,9 @@
  "engine": "InnoDB",
  "field_order": [
   "fruit_name",
-  "point"
+  "point",
+  "file_attachment",
+  "attachment_image"
  ],
  "fields": [
   {
@@ -21,11 +23,22 @@
    "fieldtype": "Data",
    "label": "Point",
    "reqd": 1
+  },
+  {
+   "fieldname": "file_attachment",
+   "fieldtype": "Attach",
+   "label": "File Attachment"
+  },
+  {
+   "fieldname": "attachment_image",
+   "fieldtype": "Attach Image",
+   "in_preview": 1,
+   "label": "Attachment Image"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-20 17:48:54.992376",
+ "modified": "2021-10-07 12:46:58.205823",
  "modified_by": "Administrator",
  "module": "Tiger App",
  "name": "Chutney",
