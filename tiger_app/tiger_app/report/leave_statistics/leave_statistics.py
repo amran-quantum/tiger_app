@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import _
 
 def execute(filters=None):
 	columns, data = [], []
@@ -29,7 +30,7 @@ def get_columns():
 		else: leave_type_list.append(el)
 
 
-	cols = ["Employee","Employee Name"]
+	cols = ["Department Code",_("Employee")+":Link/Employee:140","Employee Name"]
 	for el in leave_type_list:
 		if "Annual" in el.leave_type:
 			cols.append("Annual Leave Start")
@@ -44,12 +45,13 @@ def get_columns():
 
 def get_data(filters,leave_type_list):
 	data = frappe.db.sql("""
-	select employee, employee_name, leave_type, from_date, to_date, total_leave_days from `tabLeave Application` where from_date >= %(from_date)s  and to_date <= %(to_date)s and status=%(status)s
-	order by employee, leave_type asc""",{"from_date":filters.from_date,"to_date":filters.to_date,"status":"Approved"},as_dict=1)
+	select e.department_code,la.employee, la.employee_name, la.leave_type, la.from_date, la.to_date, la.total_leave_days from `tabLeave Application` la, `tabEmployee` e where e.employee = la.employee and la.from_date >= %(from_date)s  and la.to_date <= %(to_date)s and la.status=%(status)s
+	order by la.employee, la.leave_type asc""",{"from_date":filters.from_date,"to_date":filters.to_date,"status":"Approved"},as_dict=1)
 	
 	result = []
 	for item in data:
 		row = []
+		row.append(item.department_code)
 		row.append(item.employee)
 		row.append(item.employee_name)
 
@@ -59,13 +61,13 @@ def get_data(filters,leave_type_list):
 			row.append("")
 		for index,ritem in enumerate(leave_type_list):
 			if "Annual" in ritem.leave_type and "Annual" in item.leave_type:
-				row[2+ 3*index] = item.from_date
-				row[3+ 3*index] = item.to_date
-				row[4+ 3*index] = item.total_leave_days
+				row[3+ 3*index] = item.from_date
+				row[4+ 3*index] = item.to_date
+				row[5+ 3*index] = item.total_leave_days
 			elif ritem.leave_type == item.leave_type:
-				row[2+ 3*index] = item.from_date
-				row[3+ 3*index] = item.to_date
-				row[4+ 3*index] = item.total_leave_days
+				row[3+ 3*index] = item.from_date
+				row[4+ 3*index] = item.to_date
+				row[5+ 3*index] = item.total_leave_days
 		result.append(row)
 	
 	# data arrangement from the top
@@ -74,16 +76,16 @@ def get_data(filters,leave_type_list):
 		for elem in range((len(result)-1),0,-1):
 			if result[elem][0] == result[elem - 1][0] and elem != 0:
 				for i in range(len(leave_type_list)):
-					if result[elem][2+ 3*i] != "" and result[elem - 1][2+ 3*i ] == "":
-						temp = result[elem][2+ 3*i]
-						result[elem - 1][2+ 3*i] = temp
-						result[elem][2+ 3*i] = ""
-						temp2 = result[elem][3+ 3*i]
-						result[elem - 1][3+ 3*i] = temp2
+					if result[elem][3+ 3*i] != "" and result[elem - 1][3+ 3*i ] == "":
+						temp = result[elem][3+ 3*i]
+						result[elem - 1][3+ 3*i] = temp
 						result[elem][3+ 3*i] = ""
-						temp3 = result[elem][4+ 3*i]
-						result[elem - 1][4+ 3*i] = temp3
+						temp2 = result[elem][4+ 3*i]
+						result[elem - 1][4+ 3*i] = temp2
 						result[elem][4+ 3*i] = ""
+						temp3 = result[elem][5+ 3*i]
+						result[elem - 1][5+ 3*i] = temp3
+						result[elem][5+ 3*i] = ""
 	
 
 	# empty data elimination
@@ -91,15 +93,19 @@ def get_data(filters,leave_type_list):
 		flag = 0
 		if elem != 0:
 			for i in range(len(leave_type_list)):
-				if result[elem][2+ 3*i] != "":
+				if result[elem][3+ 3*i] != "":
 					flag = flag + 1
 		if flag == 0:
 			result.pop(elem)
 	
+	# sort by department code
+	result.sort(key=lambda y: y[0])
+
 	# name correction
 	for elem in range((len(result)-1),0,-1):
-		if result[elem][0] == result[elem - 1][0] and elem != 0:
+		if result[elem][2] == result[elem - 1][2] and elem != 0:
 			result[elem][0] = ""
 			result[elem][1] = ""
+			result[elem][2] = ""
 						
 	return result
