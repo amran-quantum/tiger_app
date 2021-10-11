@@ -103,7 +103,7 @@ def get_data(filters,leave_type_list):
 
 	# name correction
 	for elem in range((len(result)-1),0,-1):
-		if result[elem][2] == result[elem - 1][2] and elem != 0:
+		if result[elem][1] == result[elem - 1][1] and elem != 0:
 			result[elem][0] = ""
 			result[elem][1] = ""
 			result[elem][2] = ""
