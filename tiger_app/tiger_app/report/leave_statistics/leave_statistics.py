@@ -12,10 +12,10 @@ def execute(filters=None):
 	return columns, data
 def get_columns():
 	leave_type_list_from_db1 = frappe.db.sql("""
-	select distinct leave_type from `tabLeave Allocation` where leave_type like %(leave_type)s order by leave_type asc
+	select distinct leave_type from `tabLeave Application` where leave_type like %(leave_type)s order by leave_type asc
 	""",{"leave_type":"%Annual%"},as_dict=True)
 	leave_type_list_from_db2 = frappe.db.sql("""
-	select distinct leave_type from `tabLeave Allocation` where leave_type not like %(leave_type)s order by leave_type asc
+	select distinct leave_type from `tabLeave Application` where leave_type not like %(leave_type)s order by leave_type asc
 	""",{"leave_type":"%Annual%"},as_dict=True)
 	leave_type_list_from_db = leave_type_list_from_db1 + leave_type_list_from_db2
 
