@@ -37,8 +37,21 @@ def execute(filters=None):
 		a = date(int(acm_date[0]),int(acm_date[1]),int(acm_date[2]))
 		today = date.today()
 		b = date(int(today.strftime("%Y")),1,1)
-		acm = (a-b).days
-		acm = (tla / 365)*acm + (cf)
+		jd = str(item.date_of_joining)
+		jd_number = jd.split('-')
+		jd_num_date = date(int(jd_number[0]),int(jd_number[1]),int(jd_number[2]))
+		
+		# check date
+		diff_joinining_lastday = (b-jd_num_date).days
+		tot_days = 0
+		if diff_joinining_lastday > 0:
+			tot_days = (a-b).days
+		else:
+			tot_days = (a-jd_num_date).days
+
+		# acm = tot_days
+		# acm = (a-b).days
+		acm = (tla / 365)*tot_days + (cf)
 		acm = round(acm)
 		row.append(acm)
 		row.append(cf)
@@ -138,7 +151,7 @@ def get_columns(filters):
 def get_data(filters):
 	data = frappe.db.sql(
 		"""
-		select distinct ta.employee_name, ta.employee, em.department_code from `tabLeave Allocation` ta, `tabEmployee` em where from_date>=%(from_date)s and to_date<=%(to_date)s and ta.employee_name=em.employee_name
+		select distinct ta.employee_name, ta.employee, em.department_code, em.date_of_joining from `tabLeave Allocation` ta, `tabEmployee` em where from_date>=%(from_date)s and to_date<=%(to_date)s and ta.employee_name=em.employee_name
 		 order by em.department_code asc"""
 	,{"from_date":filters.from_date, "to_date":filters.to_date},as_dict=1)
 	
