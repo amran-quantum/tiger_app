@@ -108,7 +108,7 @@ def execute(filters=None):
 		if dffd_days > 0: 
 			tot_days = (a - first_date_number).days
 		else: 
-			tot_days = -1 * dffd_days
+			tot_days = days
 
 		grat = 0
 		one_day_amount = 0
@@ -138,7 +138,8 @@ def execute(filters=None):
 		for idx,value in enumerate(row):
 			item.append(flt(col[idx]['amount']))
 		item.append(flt(grat,0))
-		item.append(flt(days/365,2))
+		item.append(days)
+		# item.append(flt(days/365,2))
 		department_list = frappe.get_list('Department',filters={"department_name":item[5]},fields={"department_name","department_policy_name"})
 		if len(department_list)>0:
 			dp_check = frappe.get_list('Department Policy',filters={"department_policy_name": department_list[0].department_policy_name},fields={"air_ticket_initial"})
@@ -171,7 +172,7 @@ def execute(filters=None):
 		item.pop(6)
 
 	row.append("Gratuity")
-	row.append("Work Duration(Years)")
+	row.append("Work Duration(Days)")
 	row.append("Ticket(amount)")
 	row.append("Ticket(quantity)")
 	row.append("Leave Encashment(days)")
