@@ -54,8 +54,9 @@ def execute(filters=None):
 		cyla = frappe.get_list('Leave Application', 
 		filters={"employee":item[1],"status":"Approved",
 		 "leave_type": ('in',tuple(encashed_leave_type)),
-		 "from_date":['>=',yfd],    
-		  "to_date": ['<=',yld]}, 
+		#  "from_date":['>=',yfd],    
+		#   "to_date": ['<=',yld]
+		}, 
 		 fields={"total_leave_days"})
 		cyla_total = 0
 		for e in cyla:
@@ -78,7 +79,7 @@ def execute(filters=None):
 		tot_taken_leave = 0
 		for el in lv_app:
 			tot_taken_leave += el.total_leave_days
-		leave_encashment = tot_leave - tot_taken_leave
+		
         #leave encashment ends
 
 		grand_total = 0
@@ -88,40 +89,55 @@ def execute(filters=None):
 		col = []
 		for el in row:
 			col.append({'amount':0,'sc':el})
+
+		first_date = str(yfd).split('-')
+		first_date_number = date(int(first_date[0]),int(first_date[1]),int(first_date[2]))
+
 		today = date.today()
 		tdate = str(item[4]).split('-')
 		a = date(int(today.strftime("%Y")),int(today.strftime("%m")),int(today.strftime("%d")))
 		b = date(int(tdate[0]),int(tdate[1]),int(tdate[2]))
 
 		days = (a-b).days - cylax
+		dffd_days = (first_date_number-b).days
+
+		# check joining date is less than current year 1st date
+		# if yes total days for leve encashment is total days from 1st day of this year
+		# if not total days for leave encashment = today - joining
+
+		if dffd_days > 0: 
+			tot_days = (a - first_date_number).days
+		else: 
+			tot_days = -1 * dffd_days
+
 		grat = 0
 		one_day_amount = 0
 		for elem in split_sub_item:
 			if elem.count('{')==0:
 				csse = elem[:-1].split(',')
 				amount = csse[0].split(':')[1]
+				one_day_amount = flt(amount) / 30
 				sc = csse[1].split(':')[1][1:-1]
 				if sc[:-1] == 'Basic':
 					index = in_dictlist('sc',sc[:-1], col)
 					if days/365 > 1 or days/365 == 1:
-						one_day_amount = flt(amount) / 30
 						grat = flt((one_day_amount)*21 * (days/365),2)
 					col[index].update({'amount':amount})
 			else:
 				esse = elem[1:-1].split(',')
 				amount = esse[0].split(':')[1]
+				one_day_amount = flt(amount) / 30
 				sc = esse[1].split(':')[1][1:-1]
 				if sc[:-1] == 'Basic':
 					index = in_dictlist('sc',sc[:-1], col)
 					if days/365 > 1 or days/365 == 1:
-						one_day_amount = flt(amount) / 30
 						grat = flt((one_day_amount)*21 * (days/365),2)
 					col[index].update({'amount':amount})
 		
 			
 		for idx,value in enumerate(row):
 			item.append(flt(col[idx]['amount']))
-		item.append(grat)
+		item.append(flt(grat,0))
 		item.append(flt(days/365,2))
 		department_list = frappe.get_list('Department',filters={"department_name":item[5]},fields={"department_name","department_policy_name"})
 		if len(department_list)>0:
@@ -147,12 +163,11 @@ def execute(filters=None):
 			item.append(0)
 			item.append(0)
 
-		
-		
-		item.append(leave_encashment)
-		item.append(leave_encashment*one_day_amount)
+		leave_encashment = ((tot_leave/365)*tot_days) - tot_taken_leave - cylax
+		item.append(flt(leave_encashment,0))
+		item.append(flt((leave_encashment*one_day_amount),0))
 		grand_total = grat + te_amount + (leave_encashment*one_day_amount)
-		item.append(grand_total)
+		item.append(flt(grand_total,0))
 		item.pop(6)
 
 	row.append("Gratuity")

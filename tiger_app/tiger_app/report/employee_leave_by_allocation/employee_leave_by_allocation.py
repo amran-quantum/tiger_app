@@ -24,18 +24,21 @@ def execute(filters=None):
 	fdata = get_data(filters)
 	for item in fdata:
 		row = [item.department_code, item.employee, item.employee_name]
-
+		tla = 0
+		cf = 0
 		for elem in leave_types:
 			if "Annual" in elem:
 				lal_details = frappe.get_list('Leave Allocation', filters={'employee':item.employee,'from_date':['>=',filters.from_date],'to_date':['<=',filters.to_date],'leave_type':['like', '%Annual%'] }, fields={'leave_type','total_leaves_allocated','unused_leaves'})
-				cf = lal_details[0].unused_leaves
+				for element in lal_details:
+					cf = cf + element.unused_leaves
+					tla = tla + element.total_leaves_allocated
 
 		acm_date = filters.acm_date.split('-')
 		a = date(int(acm_date[0]),int(acm_date[1]),int(acm_date[2]))
 		today = date.today()
 		b = date(int(today.strftime("%Y")),1,1)
 		acm = (a-b).days
-		acm = (lal_details[0].total_leaves_allocated / 365)*acm + (lal_details[0].unused_leaves or 0)
+		acm = (tla / 365)*acm + (cf)
 		acm = round(acm)
 		row.append(acm)
 		row.append(cf)
@@ -43,7 +46,7 @@ def execute(filters=None):
 		for e in leave_types:
 			ldata = ""
 			if "Annual" in e:
-				leave_details = frappe.get_list('Leave Allocation', filters={'employee':item.employee,'from_date':['>=',filters.from_date],'to_date':['<=',filters.to_date],'leave_type':['like', '%Annual%'] }, fields={'leave_type','total_leaves_allocated'})
+				leave_details = frappe.get_list('Leave Allocation', filters={'employee':item.employee,'from_date':['>=',filters.from_date],'to_date':['<=',filters.to_date],'leave_type':['like', '%Annual%'] }, fields={'leave_type','total_leaves_allocated','unused_leaves'})
 				ldata = leave_details[0].leave_type
 			else:
 				leave_details = frappe.db.sql("""select * from `tabLeave Allocation` where from_date >= %(from_date)s and to_date <= %(to_date)s and leave_type=%(ltn)s and employee=%(employee)s""",{"from_date":filters.from_date, "to_date":filters.to_date,"ltn":e,"employee":item.employee},as_dict=1)
@@ -58,14 +61,17 @@ def execute(filters=None):
 			fields={"total_leave_days"}
 						)
 			
-			if len(leave_application)> 0: 			
-				total = leave_details[0].total_leaves_allocated
-				cf = leave_details[0].unused_leaves
+			if len(leave_application)> 0: 
+				total = 0
+				cf = 0	
+				for jitem in leave_details:		
+					total = total + jitem.total_leaves_allocated
+					cf = cf + jitem.unused_leaves
 				taken = 0
 
-				for elem in leave_application:
-					taken += elem.total_leave_days
-				remaining = (cf or 0)+ total - taken
+				for jelem in leave_application:
+					taken = taken + jelem.total_leave_days
+				remaining = cf + total - taken
 
 				row.append(total)
 				row.append(taken)
